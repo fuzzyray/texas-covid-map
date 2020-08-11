@@ -122,13 +122,13 @@
         .interpolator(d3.interpolateReds);
 
     const paths = texasMap.svgGroups.plotGroup.selectAll('path').data(counties);
-    tooltipDisplay = d => `<span>${d.properties.name}</span><br><span>Cases: ${d.properties.cases}</span><br><span>Deaths: ${d.properties.fatalities}</span>`;
     paths.enter()
         .append('path')
         .attr('class', 'county')
         .attr('d', d => pathGenerator(d))
         .attr('fill', d => colorScale(colorValue(d)));
 
+    const tooltipDisplay = d => `<span>${d.properties.name}</span><br><span>Cases: ${d.properties.cases}</span><br><span>Deaths: ${d.properties.fatalities}</span>`;
     texasMap.addToolTips(counties, tooltipDisplay, {}, 'n', 'path');
 
     const colorLegend = d3.legendColor()
