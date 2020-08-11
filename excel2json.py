@@ -42,4 +42,4 @@ else:
         TXCases["counts"].append(entry)
 
     with open(BASENAME + '.json', 'w', encoding='utf-8') as jsonFile:
-        jsonFile.write(json.dumps(TXCases,indent=4))
+        jsonFile.write(json.dumps(TXCases))
