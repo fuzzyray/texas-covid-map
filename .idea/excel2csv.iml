@@ -9,5 +9,6 @@
     <orderEntry type="library" name="d3" level="application" />
     <orderEntry type="library" name="d3-tip" level="application" />
     <orderEntry type="library" name="topojson" level="application" />
+    <orderEntry type="library" name="d3-legend" level="application" />
   </component>
 </module>
