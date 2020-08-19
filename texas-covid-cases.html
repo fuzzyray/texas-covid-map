@@ -78,6 +78,13 @@
           return accumulator;
         }, {});
 
+        const texasSummary = covidData.counts.reduce((acc, d) => {
+          return (d.county === 'Total') ? {Cases: d.cases, Fatalities: d.fatalities} : acc;
+        }, {});
+        texasSummary.Rate = !!texasSummary.Cases ? d3.format('.3p')(texasSummary.Fatalities / texasSummary.Cases) : 0;
+        texasSummary.Cases = d3.format(',')(texasSummary.Cases)
+        texasSummary.Fatalities = d3.format(',')(texasSummary.Fatalities)
+
         const counties = topojson.feature(topoJSONData,
             topoJSONData.objects.counties);
         // 48 is the FIPS code for Texas
@@ -86,7 +93,7 @@
         filteredData.forEach(d => {
           Object.assign(d.properties, objByCounty[d.properties.name]);
         });
-        return {timestamp: covidData.date, counties: filteredData};
+        return {timestamp: covidData.date, counties: filteredData, summary: texasSummary};
       });
 
   loadData().then(data => {
@@ -100,6 +107,7 @@
       right: {id: 'right-label', text: ''},
     };
     const counties = data.counties;
+    const summary = data.summary;
     const projection = d3.geoMercator();
     const colorScale = d3.scaleSequentialSqrt();
     const colorValue = d => d.properties.cases;
@@ -130,7 +138,8 @@
         .attr('fill', d => colorScale(colorValue(d)));
 
     const tooltipDisplay = d => `<span>${d.properties.name}</span><br><span>Cases: ${d.properties.cases}</span>` +
-        `<br><span>Deaths: ${d.properties.fatalities}</span><br><span>Case Fatality Rate: ${d3.format('.3p')(d.properties.rate)}</span>`;
+        `<br><span>Deaths: ${d.properties.fatalities}</span><br><span>Case Fatality Rate: ${d3.format('.3p')(
+            d.properties.rate)}</span>`;
     texasMap.addToolTips(counties, tooltipDisplay, {}, 'n', 'path');
 
     const colorLegend = d3.legendColor()
@@ -151,6 +160,17 @@
         .attr('class', 'legend')
         .attr('transform', 'translate(190, 10)')
         .call(colorLegend);
+
+    texasMap.svgGroups.plotGroup.append('g')
+        .attr('class', 'summary')
+        .attr('transform', 'translate(190,350)')
+        .selectAll('g')
+        .data(Object.keys(summary))
+        .enter()
+        .append('g')
+        .attr('transform', (d,i) => `translate(0, ${20 * i})`)
+        .append('text')
+        .text(d => `${d}: ${summary[d]}`)
 
     //console.log(texasMap);
   });
