@@ -32,6 +32,7 @@ else:
     }
     for row in ws.iter_rows(min_row=1, max_row=1, values_only=True):
         TXCases["date"] = row[0]
+        print(TXCases["date"])
 
     for row in ws.iter_rows(min_row=3, values_only=True):
         entry = {
