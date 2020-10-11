@@ -82,8 +82,8 @@
           return (d.county === 'Total') ? {Cases: d.cases, Fatalities: d.fatalities} : acc;
         }, {});
         texasSummary.Rate = !!texasSummary.Cases ? d3.format('.3p')(texasSummary.Fatalities / texasSummary.Cases) : 0;
-        texasSummary.Cases = d3.format(',')(texasSummary.Cases)
-        texasSummary.Fatalities = d3.format(',')(texasSummary.Fatalities)
+        texasSummary.Cases = d3.format(',')(texasSummary.Cases);
+        texasSummary.Fatalities = d3.format(',')(texasSummary.Fatalities);
 
         const counties = topojson.feature(topoJSONData,
             topoJSONData.objects.counties);
@@ -144,15 +144,16 @@
 
     const colorLegend = d3.legendColor()
         .scale(colorScale)
-        .labelFormat(d3.format('.1s'))
+        .labelFormat(d3.format('.2s'))
         .shapeHeight(10)
         .shapeWidth(10)
-        .cells([0, 500, 1000, 2000, 3000, 5000, 10000, 20000, 30000, 40000, 60000, 90000])
+        .cells([0, 500, 1000, 2000, 3000, 5000, 10000, 20000, 40000, 60000, 80000, 110000, 140000])
         .labels(({i, genLength, generatedLabels}) => {
+          console.log(generatedLabels)
           if (i === genLength - 1) {
-            return `${generatedLabels[i]} or more`;
+            return `${generatedLabels[i].replace('.0', '')} or more`;
           } else {
-            return `${generatedLabels[i]} to ${generatedLabels[i + 1]}`;
+            return `${generatedLabels[i].replace('.0', '')} to ${generatedLabels[i + 1].replace('.0', '')}`;
           }
         });
 
@@ -168,9 +169,9 @@
         .data(Object.keys(summary))
         .enter()
         .append('g')
-        .attr('transform', (d,i) => `translate(0, ${20 * i})`)
+        .attr('transform', (d, i) => `translate(0, ${20 * i})`)
         .append('text')
-        .text(d => `${d}: ${summary[d]}`)
+        .text(d => `${d}: ${summary[d]}`);
 
     //console.log(texasMap);
   });
