@@ -115,14 +115,7 @@
 
     const texasMap = new D3Chart({tooltips: true, labels: mapLabels});
     texasMap.render();
-    // Pan and zoom functionality is acting weirdly, needs investigation
-    /*
-        texasMap.svgGroups.plotGroup
-            .call(d3.zoom()
-                .on('zoom', () => {
-                  texasMap.svgGroups.plotGroup.attr('transform', d3.event.transform);
-                }));
-    */
+
     const pathGenerator = d3.geoPath()
         .projection(projection.fitSize([texasMap.plotArea.width, texasMap.plotArea.height], countyCollection));
 
@@ -149,7 +142,6 @@
         .shapeWidth(10)
         .cells([0, 500, 1000, 2000, 3000, 5000, 10000, 20000, 40000, 60000, 80000, 110000, 140000])
         .labels(({i, genLength, generatedLabels}) => {
-          console.log(generatedLabels)
           if (i === genLength - 1) {
             return `${generatedLabels[i].replace('.0', '')} or more`;
           } else {
