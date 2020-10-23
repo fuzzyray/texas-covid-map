@@ -1,6 +1,7 @@
 node_modules/
 venv/
 TexasCOVID19CaseCountData.xlsx
+~$TexasCOVID19CaseCountData.xlsx
 TexasCOVID19CaseCountData.json
 d3-abstraction-classes.js
 index.html
