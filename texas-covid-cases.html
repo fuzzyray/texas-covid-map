@@ -84,6 +84,8 @@
         texasSummary.Rate = !!texasSummary.Cases ? d3.format('.3p')(texasSummary.Fatalities / texasSummary.Cases) : 0;
         texasSummary.Cases = d3.format(',')(texasSummary.Cases);
         texasSummary.Fatalities = d3.format(',')(texasSummary.Fatalities);
+        texasSummary.Hospitalizations = d3.format(',')(covidData.hospitalizations)
+        texasSummary['Positivity Rate'] = d3.format('.3p')(covidData['positivity rate'])
 
         const counties = topojson.feature(topoJSONData,
             topoJSONData.objects.counties);
@@ -93,7 +95,11 @@
         filteredData.forEach(d => {
           Object.assign(d.properties, objByCounty[d.properties.name]);
         });
-        return {timestamp: covidData.date, counties: filteredData, summary: texasSummary};
+        return {
+          timestamp: covidData.date,
+          counties: filteredData,
+          summary: texasSummary,
+        };
       });
 
   loadData().then(data => {

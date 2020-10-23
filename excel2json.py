@@ -29,8 +29,11 @@ else:
 
     TXCases = {
         "date": None,
+        "hospitalizations": None,
+        "positivity rate": None,
         "counts": []
     }
+
     for row in ws.iter_rows(min_row=1, max_row=1, values_only=True):
         TXCases["date"] = row[0]
         print(TXCases["date"])
@@ -42,6 +45,14 @@ else:
             "fatalities": row[2]
         }
         TXCases["counts"].append(entry)
+
+    ws = wb['Hospitalizations']
+    for row in ws.iter_rows(min_row=3, max_row=3, values_only=True):
+        TXCases["hospitalizations"] = row[1]
+
+    ws = wb['Tests by Day']
+    for row in ws.iter_rows(min_row=4, max_row=4, values_only=True):
+        TXCases["positivity rate"] = row[3]
 
     with open(BASENAME + '.json', 'w', encoding='utf-8') as jsonFile:
         jsonFile.write(json.dumps(TXCases))
