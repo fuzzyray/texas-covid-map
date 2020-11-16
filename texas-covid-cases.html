@@ -16,7 +16,7 @@
             background-color: #00000025;
         }
 
-        #root {
+        #root, #footer {
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -61,10 +61,24 @@
         .summary {
             font-size: 14px;
         }
+
+        #source {
+            font-size: 1.2vw;
+        }
+
+        a {
+            text-decoration: underline;
+            color: inherit;
+        }
     </style>
 </head>
 <body>
 <div id="root"></div>
+<div id="footer">
+    <p id="source">Data Source:
+        <a href="https://dshs.texas.gov/coronavirus/TexasCOVID19CaseCountData.xlsx">https://dshs.texas.gov/coronavirus/TexasCOVID19CaseCountData.xlsx</a>
+    </p>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
@@ -122,7 +136,7 @@
       className: 'labels',
       header: {id: 'title', text: 'Texas COVID-19 Case Counts'},
       subheader: {id: '', text: data.timestamp},
-      footer: {id: 'source', text: 'Source: https://dshs.texas.gov/coronavirus/TexasCOVID19CaseCountData.xlsx'},
+      footer: {id: 'footer', text: ''},
       left: {id: 'left-label', text: ''},
       right: {id: 'right-label', text: ''},
     };
