@@ -1,29 +1,26 @@
 #!/usr/bin/env python3
 import json
 import sys
+from urllib.request import urlretrieve
+
+import pandas as pd
 from openpyxl import load_workbook
-from urllib.request import Request, urlopen
-from urllib.error import URLError
 
 URL = 'https://dshs.texas.gov/coronavirus/TexasCOVID19CaseCountData.xlsx'
 BASENAME = 'TexasCOVID19CaseCountData'
 
-req = Request(URL)
+county_population_df = pd.read_csv('Texas2018PopulationEstimate.csv', encoding="utf-8")
+county_population_df.loc[county_population_df['county'] == 'De Witt', 'county'] = 'DeWitt'
+county_population_df = county_population_df[['county', 'jan1_2019_pop_est']]
+county_population_df = county_population_df.rename(columns={"jan1_2019_pop_est": "population"})
+county_population_df = county_population_df.set_index('county')
+
 try:
-    response = urlopen(req)
-except URLError as e:
-    if hasattr(e, 'reason'):
-        print('We failed to reach a server.')
-        print('Reason: ', e.reason)
-    elif hasattr(e, 'code'):
-        print('The server couldn\'t fulfill the request.')
-        print('Error code: ', e.code)
+    urlretrieve(URL, BASENAME + '.xlsx')
+except Exception as e:
+    print(e)
     sys.exit(-1)
 else:
-    excel_data = bytes(response.read())
-    with open(BASENAME + '.xlsx', 'wb') as excelFile:
-        excelFile.write(excel_data)
-
     wb = load_workbook(filename=BASENAME + '.xlsx')
     ws = wb['Case and Fatalities']
 
@@ -39,20 +36,39 @@ else:
         print(TXCases["date"])
 
     for row in ws.iter_rows(min_row=3, values_only=True):
-        entry = {
-            "county": row[0],
-            "cases": row[1],
-            "fatalities": row[2]
-        }
+        if row[0] in county_population_df.index:
+            entry = {
+                "county": row[0],
+                "population": int(county_population_df.loc[row[0]].population),
+                "cases": row[1],
+                "fatalities": row[2]
+            }
+        elif row[0] == "Total":
+            entry = {
+                "county": row[0],
+                "population": int(county_population_df.loc['State of Texas'].population),
+                "cases": row[1],
+                "fatalities": row[2]
+            }
+        else:
+            continue
+
         TXCases["counts"].append(entry)
 
     ws = wb['Hospitalizations']
     for row in ws.iter_rows(min_row=3, max_row=3, values_only=True):
         TXCases["hospitalizations"] = row[1]
 
+    if str(TXCases["hospitalizations"]).lower() == 'count':
+        for row in ws.iter_rows(min_row=4, max_row=4, values_only=True):
+            TXCases["hospitalizations"] = row[1]
+
+    print("hospitalizations:", TXCases["hospitalizations"])
+
     ws = wb['Tests by Day']
     for row in ws.iter_rows(min_row=4, max_row=4, values_only=True):
         TXCases["positivity rate"] = row[3]
+        print("Positivity Rate:", TXCases["positivity rate"])
 
     with open(BASENAME + '.json', 'w', encoding='utf-8') as jsonFile:
         jsonFile.write(json.dumps(TXCases))

@@ -78,18 +78,28 @@
       ]).then(([covidData, topoJSONData]) => {
         const objByCounty = covidData.counts.reduce((accumulator, d) => {
           const rate = !!d.cases ? d.fatalities / d.cases : 0;
-          accumulator[d.county] = {cases: d.cases, fatalities: d.fatalities, rate: rate};
+          const casesPerThousand = d.cases * 1000 / d.population;
+          const fatalitiesPerThousand = d.fatalities * 1000 / d.population;
+          accumulator[d.county] = {
+            cases: d.cases,
+            population: d.population,
+            fatalities: d.fatalities,
+            casesPerThousand: casesPerThousand,
+            fatalitiesPerThousand: fatalitiesPerThousand,
+            rate: rate,
+          };
           return accumulator;
         }, {});
 
         const texasSummary = covidData.counts.reduce((acc, d) => {
           return (d.county === 'Total') ? {Cases: d.cases, Fatalities: d.fatalities} : acc;
         }, {});
-        texasSummary.Rate = !!texasSummary.Cases ? d3.format('.3p')(texasSummary.Fatalities / texasSummary.Cases) : 0;
+        texasSummary['Case Fatality Rate'] = !!texasSummary.Cases ? d3.format('.3p')(
+            texasSummary.Fatalities / texasSummary.Cases) : 0;
         texasSummary.Cases = d3.format(',')(texasSummary.Cases);
         texasSummary.Fatalities = d3.format(',')(texasSummary.Fatalities);
-        texasSummary.Hospitalizations = d3.format(',')(covidData.hospitalizations)
-        texasSummary['Positivity Rate'] = d3.format('.3p')(covidData['positivity rate'])
+        texasSummary.Hospitalizations = d3.format(',')(covidData.hospitalizations);
+        texasSummary['Positivity Rate'] = d3.format('.3p')(covidData['positivity rate']);
 
         const counties = topojson.feature(topoJSONData,
             topoJSONData.objects.counties);
@@ -140,9 +150,14 @@
         .attr('d', d => pathGenerator(d))
         .attr('fill', d => colorScale(colorValue(d)));
 
-    const tooltipDisplay = d => `<span>${d.properties.name}</span><br><span>Cases: ${d.properties.cases}</span>` +
-        `<br><span>Deaths: ${d.properties.fatalities}</span><br><span>Case Fatality Rate: ${d3.format('.3p')(
-            d.properties.rate)}</span>`;
+    const tooltipDisplay = d => `<span>${d.properties.name}</span>` +
+        `<br><span>Population: ${d.properties.population}</span>` +
+        `<br><span>Cases: ${d.properties.cases}</span>` +
+        `<br><span>Deaths: ${d.properties.fatalities}</span>` +
+        `<br><span>Cases per thousand: ${d3.format('.2f')(d.properties.casesPerThousand)}</span>` +
+        `<br><span>Deaths per thousand: ${d3.format('.2f')(d.properties.fatalitiesPerThousand)}</span>` +
+        `<br><span>Case Fatality Rate: ${d3.format('.3p')(d.properties.rate)}</span>`;
+
     texasMap.addToolTips(counties, tooltipDisplay, {}, 'n', 'path');
 
     const colorLegend = d3.legendColor()
@@ -150,7 +165,8 @@
         .labelFormat(d3.format('.2s'))
         .shapeHeight(10)
         .shapeWidth(10)
-        .cells([0, 500, 1000, 2000, 3000, 5000, 10000, 20000, 40000, 60000, 80000, 110000, 140000])
+        //.cells(10)
+        .cells([0, 500, 1000, 2000, 3000, 5000, 10000, 20000, 40000, 60000, 90000, 120000, 160000])
         .labels(({i, genLength, generatedLabels}) => {
           if (i === genLength - 1) {
             return `${generatedLabels[i].replace('.0', '')} or more`;
