@@ -9,6 +9,9 @@ from openpyxl import load_workbook
 URL = 'https://dshs.texas.gov/coronavirus/TexasCOVID19CaseCountData.xlsx'
 BASENAME = 'TexasCOVID19CaseCountData'
 
+# Read the latest population estimate from Texas Demographic Center https://demographics.texas.gov
+# urlretrieve('https://demographics.texas.gov/Resources/TPEPP/Estimates/2018/2018_txpopest_county.csv',
+#             'Texas2018PopulationEstimate.csv')
 county_population_df = pd.read_csv('Texas2018PopulationEstimate.csv', encoding="utf-8")
 county_population_df.loc[county_population_df['county'] == 'De Witt', 'county'] = 'DeWitt'
 county_population_df = county_population_df[['county', 'jan1_2019_pop_est']]
