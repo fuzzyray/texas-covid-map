@@ -28,13 +28,6 @@ else:
     # Read the Covid Data from the spreadsheet
     all_data = pd.read_excel('TexasCOVID19CaseCountData.xlsx', sheet_name=None, header=None)
 
-    # Get the number of current hospitalizations
-    hospitalization_df = all_data['Hospitalization by Day'].copy().dropna().reset_index(drop=True)
-    hospitalization_df = hospitalization_df[[1, 2]]
-    hospitalization_df.columns = hospitalization_df.iloc[0]
-    hospitalization_df = hospitalization_df[1:]
-    hospitalization_df = hospitalization_df.tail(1).reset_index(drop=True)
-
     # Get the Case and Fatality data
     cases_df = all_data['Case and Fatalities'].copy().dropna().reset_index(drop=True)
     cases_df.columns = cases_df.iloc[0]
@@ -44,7 +37,7 @@ else:
 
     TXCases = {
         "date": all_data['Case and Fatalities'][0][0],
-        "hospitalizations": hospitalization_df.at[0, 'Hospitalizations'],
+        "hospitalizations": all_data['Hospitalization by Day'][[2]].copy().dropna().tail(1).iat[0, 0],
         "positivity rate": all_data['Tests by Day'].at[3, 3],
         "counts": json.loads(cases_df.to_json(orient='records'))
     }
