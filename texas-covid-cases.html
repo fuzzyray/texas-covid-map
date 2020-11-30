@@ -145,6 +145,7 @@
     const counties = data.counties;
     const summary = data.summary;
     const projection = d3.geoMercator();
+    //const colorScale = d3.scaleSequential();
     const colorScale = d3.scaleSequentialSqrt();
     const colorValue = d => d.properties.cases;
     const countyCollection = {type: 'FeatureCollection', features: counties};
@@ -181,8 +182,8 @@
         .labelFormat(d3.format('.2s'))
         .shapeHeight(10)
         .shapeWidth(10)
-        //.cells(10)
-        .cells([0, 500, 1000, 2000, 3000, 5000, 10000, 20000, 40000, 60000, 90000, 120000, 160000])
+        //.cells(13)
+        .cells([0, 500, 1000, 2000, 3000, 5000, 10000, 20000, 40000, 60000, 90000, 120000, 180000])
         .labels(({i, genLength, generatedLabels}) => {
           if (i === genLength - 1) {
             return `${generatedLabels[i].replace('.0', '')} or more`;
