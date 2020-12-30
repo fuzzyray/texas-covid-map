@@ -26,19 +26,20 @@ else:
     county_population_df = county_population_df.set_index('county')
 
     # Read the Covid Data from the spreadsheet
-    all_data = pd.read_excel('TexasCOVID19CaseCountData.xlsx', sheet_name=None, header=None)
+    all_data = pd.read_excel('TexasCOVID19CaseCountData.xlsx', sheet_name=None, header=None, engine='openpyxl')
 
     # Get the Case and Fatality data
     cases_df = all_data['Case and Fatalities'].copy().dropna().reset_index(drop=True)
     cases_df.columns = cases_df.iloc[0]
     cases_df = cases_df[1:]
-    cases_df = cases_df.rename(columns={"County": "county", "Cases": "cases", "Fatalities": "fatalities"})
+    cases_df = cases_df.rename(columns={"County": "county", "Confirmed\nCases": "cases", "Fatalities": "fatalities"})
+    cases_df = cases_df.drop(columns=['Probable\nCases'])
     cases_df = cases_df.merge(county_population_df, on='county')
 
     TXCases = {
         "date": all_data['Case and Fatalities'][0][0],
         "hospitalizations": all_data['Hospitalization by Day'][[2]].dropna().tail(1).iat[0, 0],
-        "positivity rate": all_data['Tests by Day'].at[3, 3],
+        "positivity rate": all_data['Tests by Day'].at[2, 5],
         "counts": json.loads(cases_df.to_json(orient='records'))
     }
 
