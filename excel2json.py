@@ -39,11 +39,13 @@ else:
     TXCases = {
         "date": all_data['Case and Fatalities'][0][0],
         "hospitalizations": all_data['Hospitalization by Day'][[2]].dropna().tail(1).iat[0, 0],
-        "positivity rate": all_data['Tests by Day'].at[2, 5],
+        "positivity rate": all_data['Molecular Positivity Rate'].at[2, 5],
         "counts": json.loads(cases_df.to_json(orient='records'))
     }
 
     print(TXCases["date"])
+    print("Cases:", TXCases["counts"][-1]["cases"])
+    print("Deaths:", TXCases["counts"][-1]["fatalities"])
     print("hospitalizations:", TXCases["hospitalizations"])
     print("Positivity Rate:", TXCases["positivity rate"])
 
