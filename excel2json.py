@@ -22,8 +22,8 @@ else:
     county_population_df.loc[county_population_df['county'] == 'De Witt', 'county'] = 'DeWitt'
     county_population_df = county_population_df[['county', 'jan1_2020_pop_est']]
     county_population_df = county_population_df.rename(columns={"jan1_2020_pop_est": "population"})
-    county_population_df = county_population_df.replace(to_replace='State of Texas', value='Total')
     county_population_df = county_population_df.set_index('county')
+    county_population_df = county_population_df.drop(index='State of Texas')
 
     # Read the Covid Data from the spreadsheet
     all_data = pd.read_excel('TexasCOVID19CaseCountData.xlsx', sheet_name=None, header=None, engine='openpyxl')
@@ -35,6 +35,16 @@ else:
     cases_df = cases_df.rename(columns={"County": "county", "Confirmed Cases": "cases", "Fatalities": "fatalities"})
     cases_df = cases_df.drop(columns=['Probable Cases'])
     cases_df = cases_df.merge(county_population_df, on='county')
+
+    # Sum the total counts
+    totals = {
+        'county': 'Total',
+        'cases': cases_df['cases'].sum(),
+        'fatalities': cases_df['fatalities'].sum(),
+        'population': cases_df['population'].sum()
+    }
+
+    cases_df = cases_df.append(totals, ignore_index=True)
 
     TXCases = {
         "date": all_data['Case and Fatalities'][0][0],
