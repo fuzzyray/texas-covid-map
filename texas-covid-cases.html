@@ -182,7 +182,7 @@
         .shapeHeight(10)
         .shapeWidth(10)
         // .cells(13)
-        .cells([0, 3000, 5000, 10000, 30000, 50000, 75000, 90000, 135000, 195000, 225000, 270000, 415000])
+        .cells([0, 3000, 5000, 10000, 30000, 50000, 75000, 90000, 135000, 200000, 250000, 330000, 550000])
         .labels(({i, genLength, generatedLabels}) => {
           if (i === genLength - 1) {
             return `${generatedLabels[i].replace('.0', '')} or more`;
@@ -193,7 +193,7 @@
 
     texasMap.svgGroups.plotGroup.append('g')
         .attr('class', 'legend')
-        .attr('transform', 'translate(190, 10)')
+        .attr('transform', 'translate(190, 5)')
         .call(colorLegend);
 
     texasMap.svgGroups.plotGroup.append('g')
