@@ -12,8 +12,7 @@ try:
     print("Retrieving:", URL)
     urlretrieve(URL, BASENAME + '.xlsx')
 except Exception as e:
-    print(e)
-    sys.exit(-1)
+    sys.exit(e)
 else:
     # Read the latest population estimate from Texas Demographic Center https://demographics.texas.gov
     # urlretrieve('https://demographics.texas.gov/Resources/TPEPP/Estimates/2019/2019_txpopest_county.csv',
