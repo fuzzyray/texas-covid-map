@@ -45,10 +45,15 @@ else:
 
     cases_df = cases_df.append(totals, ignore_index=True)
 
+    # Spreadsheet sometimes has positivity rate value as float, other times as string
+    positivity_rate = all_data['Molecular Positivity Rate'].at[2, 5]
+    if isinstance(positivity_rate, str):
+        positivity_rate = float(positivity_rate[:-1]) / 100
+
     TXCases = {
         "date": all_data['Case and Fatalities'][0][0],
         "hospitalizations": all_data['Hospitalization by Day'][[1]].dropna().tail(1).iat[0, 0],
-        "positivity rate": float(all_data['Molecular Positivity Rate'].at[2, 5][:-1]) / 100,
+        "positivity rate": positivity_rate,
         "counts": json.loads(cases_df.to_json(orient='records'))
     }
 
