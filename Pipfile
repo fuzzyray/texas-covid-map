@@ -9,3 +9,4 @@ autopep8 = "*"
 [packages]
 pandas = "*"
 openpyxl = "*"
+requests = "*"

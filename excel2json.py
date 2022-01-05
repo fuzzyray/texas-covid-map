@@ -1,26 +1,36 @@
 #!/usr/bin/env python3
 import json
 import sys
-from urllib.request import urlretrieve
 
 import pandas as pd
+import requests
 
-URL = 'https://dshs.texas.gov/coronavirus/TexasCOVID19CaseCountData.xlsx'
 BASENAME = 'TexasCOVID19CaseCountData'
+URL = f'https://dshs.texas.gov/coronavirus/{BASENAME}.xlsx'
 
-try:
-    print("Retrieving:", URL)
-    urlretrieve(URL, BASENAME + '.xlsx')
-except Exception as e:
-    sys.exit(e)
-else:
+
+def main():
+    # Retrieve the latest copy of the spreadsheet
+    try:
+        print('Retrieving:', URL)
+        r = requests.get(URL)
+    except requests.RequestException as e:
+        sys.exit(e)
+    else:
+        if r.status_code == 200:
+            with open(f'{BASENAME}.xlsx', 'wb') as fd:
+                for chunk in r.iter_content():
+                    fd.write(chunk)
+        else:
+            sys.exit(f'Unable to retrieve file. Status Code: (r.status_code)')
+
     # Read the latest population estimate from Texas Demographic Center https://demographics.texas.gov
     # urlretrieve('https://demographics.texas.gov/Resources/TPEPP/Estimates/2019/2019_txpopest_county.csv',
     #             'Texas2019PopulationEstimate.csv')
-    county_population_df = pd.read_csv('Texas2019PopulationEstimate.csv', encoding="utf-8")
+    county_population_df = pd.read_csv('Texas2019PopulationEstimate.csv', encoding='utf-8')
     county_population_df.loc[county_population_df['county'] == 'De Witt', 'county'] = 'DeWitt'
     county_population_df = county_population_df[['county', 'jan1_2020_pop_est']]
-    county_population_df = county_population_df.rename(columns={"jan1_2020_pop_est": "population"})
+    county_population_df = county_population_df.rename(columns={'jan1_2020_pop_est': 'population'})
     county_population_df = county_population_df.set_index('county')
     county_population_df = county_population_df.drop(index='State of Texas')
 
@@ -31,7 +41,7 @@ else:
     cases_df = all_data['Case and Fatalities'].copy().dropna().reset_index(drop=True)
     cases_df.columns = cases_df.iloc[0]
     cases_df = cases_df[1:]
-    cases_df = cases_df.rename(columns={"County": "county", "Confirmed Cases": "cases", "Fatalities": "fatalities"})
+    cases_df = cases_df.rename(columns={'County': 'county', 'Confirmed Cases': 'cases', 'Fatalities': 'fatalities'})
     cases_df = cases_df.drop(columns=['Probable Cases'])
     cases_df = cases_df.merge(county_population_df, on='county')
 
@@ -51,17 +61,21 @@ else:
         positivity_rate = float(positivity_rate[:-1]) / 100
 
     TXCases = {
-        "date": all_data['Case and Fatalities'][0][0],
-        "hospitalizations": all_data['Hospitalization by Day'][[1]].dropna().tail(1).iat[0, 0],
-        "positivity rate": positivity_rate,
-        "counts": json.loads(cases_df.to_json(orient='records'))
+        'date': all_data['Case and Fatalities'][0][0],
+        'hospitalizations': all_data['Hospitalization by Day'][[1]].dropna().tail(1).iat[0, 0],
+        'positivity rate': positivity_rate,
+        'counts': json.loads(cases_df.to_json(orient='records'))
     }
 
-    print(TXCases["date"])
-    print("Cases:", TXCases["counts"][-1]["cases"])
-    print("Deaths:", TXCases["counts"][-1]["fatalities"])
-    print("hospitalizations:", TXCases["hospitalizations"])
-    print("Positivity Rate:", TXCases["positivity rate"])
+    print(TXCases['date'])
+    print('Cases:', TXCases['counts'][-1]['cases'])
+    print('Deaths:', TXCases['counts'][-1]['fatalities'])
+    print('hospitalizations:', TXCases['hospitalizations'])
+    print('Positivity Rate:', TXCases['positivity rate'])
 
     with open(BASENAME + '.json', 'w', encoding='utf-8') as jsonFile:
         jsonFile.write(json.dumps(TXCases))
+
+
+if __name__ == '__main__':
+    main()
