@@ -60,21 +60,21 @@ def main():
     if isinstance(positivity_rate, str):
         positivity_rate = float(positivity_rate[:-1]) / 100
 
-    TXCases = {
+    texas_cases = {
         'date': all_data['Case and Fatalities'][0][0],
         'hospitalizations': all_data['Hospitalization by Day'][[1]].dropna().tail(1).iat[0, 0],
         'positivity rate': positivity_rate,
         'counts': json.loads(cases_df.to_json(orient='records'))
     }
 
-    print(TXCases['date'])
-    print('Cases:', TXCases['counts'][-1]['cases'])
-    print('Deaths:', TXCases['counts'][-1]['fatalities'])
-    print('hospitalizations:', TXCases['hospitalizations'])
-    print('Positivity Rate:', TXCases['positivity rate'])
+    print(texas_cases['date'])
+    print('Cases:', texas_cases['counts'][-1]['cases'])
+    print('Deaths:', texas_cases['counts'][-1]['fatalities'])
+    print('hospitalizations:', texas_cases['hospitalizations'])
+    print('Positivity Rate:', texas_cases['positivity rate'])
 
-    with open(BASENAME + '.json', 'w', encoding='utf-8') as jsonFile:
-        jsonFile.write(json.dumps(TXCases))
+    with open(f'{BASENAME}.json', 'w', encoding='utf-8') as json_file:
+        json_file.write(json.dumps(texas_cases))
 
 
 if __name__ == '__main__':
