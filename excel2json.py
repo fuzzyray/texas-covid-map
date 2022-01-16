@@ -70,7 +70,7 @@ def main():
     print(texas_cases['date'])
     print('Cases:', texas_cases['counts'][-1]['cases'])
     print('Deaths:', texas_cases['counts'][-1]['fatalities'])
-    print('hospitalizations:', texas_cases['hospitalizations'])
+    print('Hospitalizations:', texas_cases['hospitalizations'])
     print('Positivity Rate:', texas_cases['positivity rate'])
 
     with open(f'{BASENAME}.json', 'w', encoding='utf-8') as json_file:

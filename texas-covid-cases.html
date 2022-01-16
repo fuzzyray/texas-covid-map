@@ -110,12 +110,14 @@
         const texasSummary = covidData.counts.reduce((acc, d) => {
           return (d.county === 'Total') ? {Cases: d.cases, Fatalities: d.fatalities} : acc;
         }, {});
-        texasSummary['Case Fatality Rate'] = !!texasSummary.Cases ? d3.format('.3p')(
+        texasSummary['Total Cases'] = d3.format(',')(texasSummary.Cases);
+        texasSummary['Total Fatalities'] = d3.format(',')(texasSummary.Fatalities);
+        texasSummary['Current Case Fatality Rate'] = !!texasSummary.Cases ? d3.format('.3p')(
             texasSummary.Fatalities / texasSummary.Cases) : 0;
-        texasSummary.Cases = d3.format(',')(texasSummary.Cases);
-        texasSummary.Fatalities = d3.format(',')(texasSummary.Fatalities);
-        texasSummary.Hospitalizations = d3.format(',')(covidData.hospitalizations);
-        texasSummary['Positivity Rate'] = d3.format('.3p')(covidData['positivity rate']);
+        texasSummary['Current Hospitalizations'] = d3.format(',')(covidData.hospitalizations);
+        texasSummary['Current Positivity Rate'] = d3.format('.3p')(covidData['positivity rate']);
+        delete texasSummary.Cases;
+        delete texasSummary.Fatalities;
 
         const counties = topojson.feature(topoJSONData,
             topoJSONData.objects.counties);
@@ -168,8 +170,8 @@
 
     const tooltipDisplay = d => `<span>${d.properties.name}</span>` +
         `<br><span>Population: ${d3.format(',')(d.properties.population)}</span>` +
-        `<br><br><span>Cases: ${d.properties.cases}</span>` +
-        `<br><span>Deaths: ${d.properties.fatalities}</span>` +
+        `<br><br><span>Total Cases: ${d.properties.cases}</span>` +
+        `<br><span>Total Deaths: ${d.properties.fatalities}</span>` +
         `<br><span>Cases per thousand: ${d3.format('.2f')(d.properties.casesPerThousand)}</span>` +
         `<br><span>Deaths per thousand: ${d3.format('.2f')(d.properties.fatalitiesPerThousand)}</span>` +
         `<br><span>Case Fatality Rate: ${d3.format('.3p')(d.properties.rate)}</span>`;
@@ -182,7 +184,7 @@
         .shapeHeight(10)
         .shapeWidth(10)
         // .cells(13)
-        .cells([0, 3000, 5000, 10000, 30000, 50000, 75000, 90000, 135000, 200000, 250000, 330000, 550000])
+        .cells([0, 3000, 5000, 10000, 30000, 50000, 75000, 100000, 150000, 200000, 350000, 450000, 850000])
         .labels(({i, genLength, generatedLabels}) => {
           if (i === genLength - 1) {
             return `${generatedLabels[i].replace('.0', '')} or more`;
