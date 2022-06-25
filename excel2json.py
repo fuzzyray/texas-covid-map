@@ -22,7 +22,7 @@ def main():
                 for chunk in r.iter_content():
                     fd.write(chunk)
         else:
-            sys.exit(f'Unable to retrieve file. Status Code: (r.status_code)')
+            sys.exit(f'Unable to retrieve file. Status Code: {r.status_code}')
 
     # Read the latest population estimate from Texas Demographic Center https://demographics.texas.gov
     # urlretrieve('https://demographics.texas.gov/Resources/TPEPP/Estimates/2019/2019_txpopest_county.csv',
