@@ -27,12 +27,20 @@ def main():
     # Read the latest population estimate from Texas Demographic Center https://demographics.texas.gov
     # urlretrieve('https://demographics.texas.gov/Resources/TPEPP/Estimates/2019/2019_txpopest_county.csv',
     #             'Texas2019PopulationEstimate.csv')
-    county_population_df = pd.read_csv('Texas2019PopulationEstimate.csv', encoding='utf-8')
-    county_population_df.loc[county_population_df['county'] == 'De Witt', 'county'] = 'DeWitt'
-    county_population_df = county_population_df[['county', 'jan1_2020_pop_est']]
-    county_population_df = county_population_df.rename(columns={'jan1_2020_pop_est': 'population'})
+    # county_population_df = pd.read_csv('Texas2019PopulationEstimate.csv', encoding='utf-8')
+    # county_population_df.loc[county_population_df['county'] == 'De Witt', 'county'] = 'DeWitt'
+    # county_population_df = county_population_df[['county', 'jan1_2020_pop_est']]
+    # county_population_df = county_population_df.rename(columns={'jan1_2020_pop_est': 'population'})
+    # county_population_df = county_population_df.set_index('county')
+    # county_population_df = county_population_df.drop(index='State of Texas')
+
+    # 2020 Census data:
+    # https://demographics.texas.gov//Resources/Decennial/2020/Redistrict/pl94-171/csvdata/totpop/sumlev/tx48s050.zip
+    # Columns: BASENAME, POP100
+    county_population_df = pd.read_csv('tx48s050.csv', encoding='utf-8')
+    county_population_df = county_population_df[['BASENAME', 'POP100']]
+    county_population_df = county_population_df.rename(columns={'BASENAME': 'county', 'POP100': 'population'})
     county_population_df = county_population_df.set_index('county')
-    county_population_df = county_population_df.drop(index='State of Texas')
 
     # Read the Covid Data from the spreadsheet
     all_data = pd.read_excel('TexasCOVID19CaseCountData.xlsx', sheet_name=None, header=None, engine='openpyxl')
