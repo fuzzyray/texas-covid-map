@@ -170,8 +170,8 @@
 
     const tooltipDisplay = d => `<span>${d.properties.name}</span>` +
         `<br><span>Population: ${d3.format(',')(d.properties.population)}</span>` +
-        `<br><br><span>Total Cases: ${d.properties.cases}</span>` +
-        `<br><span>Total Deaths: ${d.properties.fatalities}</span>` +
+        `<br><br><span>Total Cases: ${d3.format(',')(d.properties.cases)}</span>` +
+        `<br><span>Total Deaths: ${d3.format(',')(d.properties.fatalities)}</span>` +
         `<br><span>Cases per thousand: ${d3.format('.2f')(d.properties.casesPerThousand)}</span>` +
         `<br><span>Deaths per thousand: ${d3.format('.2f')(d.properties.fatalitiesPerThousand)}</span>` +
         `<br><span>Case Fatality Rate: ${d3.format('.3p')(d.properties.rate)}</span>`;
