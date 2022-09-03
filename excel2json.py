@@ -9,6 +9,7 @@ BASENAME = 'TexasCOVID19CaseCountData'
 URL = f'https://dshs.texas.gov/coronavirus/{BASENAME}.xlsx'
 
 
+# TODO: Look at Fabric for transferring to web server
 def main():
     # Retrieve the latest copy of the spreadsheet
     try:
@@ -17,7 +18,7 @@ def main():
     except requests.RequestException as e:
         sys.exit(e)
     else:
-        if r.status_code == 200:
+        if r:
             with open(f'{BASENAME}.xlsx', 'wb') as fd:
                 for chunk in r.iter_content():
                     fd.write(chunk)
@@ -70,7 +71,8 @@ def main():
 
     texas_cases = {
         'date': all_data['Case and Fatalities_ALL'][0][0],
-        'hospitalizations': all_data['Hospitalization by Day'][[1]].dropna().tail(1).iat[0, 0],
+        # 'hospitalizations': all_data['Hospitalization by Day'][[1]].dropna().tail(1).iat[0, 0],
+        'hospitalizations': all_data['Hospitalizations'].at[3, 1],
         'positivity rate': positivity_rate,
         'counts': json.loads(cases_df.to_json(orient='records'))
     }
