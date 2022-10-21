@@ -9,8 +9,11 @@ BASENAME = 'TexasCOVID19CaseCountData'
 URL = f'https://dshs.texas.gov/coronavirus/{BASENAME}.xlsx'
 
 
-# TODO: Look at Fabric for transferring to web server
 def main():
+    excel_filename = f'{BASENAME}.xlsx'
+    json_filename = f'{BASENAME}.json'
+    population_filename = 'tx48s050.csv'
+
     # Retrieve the latest copy of the spreadsheet
     try:
         print('Retrieving:', URL)
@@ -19,7 +22,7 @@ def main():
         sys.exit(e)
     else:
         if r:
-            with open(f'{BASENAME}.xlsx', 'wb') as fd:
+            with open(excel_filename, 'wb') as fd:
                 for chunk in r.iter_content():
                     fd.write(chunk)
         else:
@@ -28,13 +31,13 @@ def main():
     # 2020 Census data:
     # https://demographics.texas.gov/Resources/Decennial/2020/Redistrict/pl94-171/csvdata/totpop/sumlev/tx48s050.zip
     # Columns: BASENAME, POP100
-    county_population_df = pd.read_csv('tx48s050.csv', encoding='utf-8')
+    county_population_df = pd.read_csv(population_filename, encoding='utf-8')
     county_population_df = county_population_df[['BASENAME', 'POP100']]
     county_population_df = county_population_df.rename(columns={'BASENAME': 'county', 'POP100': 'population'})
     county_population_df = county_population_df.set_index('county')
 
     # Read the Covid Data from the spreadsheet
-    all_data = pd.read_excel('TexasCOVID19CaseCountData.xlsx', sheet_name=None, header=None, engine='openpyxl')
+    all_data = pd.read_excel(excel_filename, sheet_name=None, header=None, engine='openpyxl')
 
     # Get the Case and Fatality data
     cases_df = all_data['Case and Fatalities_ALL'].copy().dropna().reset_index(drop=True)
@@ -61,7 +64,6 @@ def main():
 
     texas_cases = {
         'date': all_data['Case and Fatalities_ALL'][0][0],
-        # 'hospitalizations': all_data['Hospitalization by Day'][[1]].dropna().tail(1).iat[0, 0],
         'hospitalizations': all_data['Hospitalizations'].at[3, 1],
         'positivity rate': positivity_rate,
         'counts': json.loads(cases_df.to_json(orient='records'))
@@ -73,7 +75,7 @@ def main():
     print('Hospitalizations:', texas_cases['hospitalizations'])
     print('Positivity Rate:', texas_cases['positivity rate'])
 
-    with open(f'{BASENAME}.json', 'w', encoding='utf-8') as json_file:
+    with open(json_filename, 'w', encoding='utf-8') as json_file:
         json_file.write(json.dumps(texas_cases))
 
 
